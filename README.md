@@ -1,15 +1,15 @@
-# 3x-ui 去广告版
+# 3x-ui Ad-Free Edition
 
-本项目是基于原版 3x-ui 制作的去广告版本，已移除内置广告和推广内容。
+This is an ad-free version based on the original 3x-ui project, with built-in advertisements and promotional content removed.
 
-原版项目：[MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui)
+Original project: [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui)
 
-## 一键安装
+## One-Command Installation
 
-在 Linux 服务器上以 root 用户执行，安装本仓库最新的正式发布版本：
+Run the following command as root on a Linux server to install the latest stable release from this repository:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/OJZen/3x-ui/main/install.sh)
 ```
 
-需先将修改推送至本仓库，启用 GitHub Actions，并推送 `v*.*.*` 格式的版本标签以自动构建和发布安装包。安装完成后会显示面板地址和登录信息。
+A stable release with installation packages must be published before this command can be used. Push the changes to this repository, enable GitHub Actions, and push a version tag matching `v*.*.*` to build and publish the packages automatically. The installer displays the panel URL and login credentials when installation finishes.
