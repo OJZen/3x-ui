@@ -12,6 +12,8 @@ on:
 
 jobs:
   build:
+    # These Docker Hub credentials and image names belong to the upstream project.
+    if: github.repository == 'MHSanaei/3x-ui'
     runs-on: ubuntu-latest
 
     steps:
