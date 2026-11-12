@@ -11,7 +11,7 @@ export interface InstallOptions {
   webBasePath: string;
 }
 
-const REPO_RAW = 'https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh';
+const REPO_RAW = 'https://raw.githubusercontent.com/OJZen/3x-ui/main/install.sh';
 const IMAGE = 'ghcr.io/mhsanaei/3x-ui:latest';
 
 function isLatest(version: string): boolean {
@@ -19,11 +19,8 @@ function isLatest(version: string): boolean {
   return v === '' || v === 'latest';
 }
 
-/**
- * The one-line script install command. The master install script reads the
- * version as its first argument: empty = latest stable release, a tag like
- * `v3.4.0` = that release, and `dev-latest` = the rolling per-commit dev build.
- */
+// Builds the install command for the latest stable release, a version tag,
+// or the rolling dev-latest build.
 export function buildScriptCommand(options: InstallOptions): string {
   if (isLatest(options.version)) {
     return `bash <(curl -Ls ${REPO_RAW})`;

@@ -7,7 +7,6 @@ import { applyDocumentTitle } from '@/utils';
 import { readyI18n } from '@/i18n/react';
 import { AntdRootConfig } from '@/i18n/AntdRootConfig';
 import { ThemeProvider } from '@/hooks/useTheme';
-import { QueryProvider } from '@/api/QueryProvider';
 import LoginPage from '@/pages/login/LoginPage';
 
 setupHttp();
@@ -24,9 +23,7 @@ readyI18n().then(() => {
     createRoot(root).render(
       <AntdRootConfig>
         <ThemeProvider>
-          <QueryProvider>
-            <LoginPage />
-          </QueryProvider>
+          <LoginPage />
         </ThemeProvider>
       </AntdRootConfig>,
     );
