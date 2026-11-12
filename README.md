@@ -12,4 +12,4 @@ Run the following command as root on a Linux server to install the latest stable
 bash <(curl -fsSL https://raw.githubusercontent.com/OJZen/3x-ui/main/install.sh)
 ```
 
-A stable release with installation packages must be published before this command can be used. Push the changes to this repository, enable GitHub Actions, and push a version tag matching `v*.*.*` to build and publish the packages automatically. The installer displays the panel URL and login credentials when installation finishes.
+A stable release with installation packages must be published before this command can be used. With GitHub Actions enabled, push a version tag matching `v*.*.*` or run the release workflow manually on that tag to build and publish the packages. Manual runs on a branch only produce build artifacts. The installer displays the panel URL and login credentials when installation finishes.
