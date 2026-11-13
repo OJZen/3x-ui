@@ -1,0 +1,67 @@
+name: Publish existing release build
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful version-tag build run ID
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      BUILD_RUN_ID: ${{ inputs.run_id }}
+    steps:
+      - name: Validate source build and version tag
+        id: source
+        run: |
+          set -euo pipefail
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN_ID" > build.json
+          jq -e --arg repo "$GH_REPO" '.conclusion == "success" and (.event == "push" or .event == "workflow_dispatch") and .path == ".github/workflows/release.yml" and .repository.full_name == $repo' build.json
+          tag=$(jq -r .head_branch build.json)
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          sha=$(gh api "repos/$GH_REPO/commits/$tag" --jq .sha)
+          [[ "$sha" == "$(jq -r .head_sha build.json)" ]]
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Download the completed build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          merge-multiple: true
+          path: packages
+
+      - name: Verify package completeness and checksums
+        working-directory: packages
+        run: |
+          set -euo pipefail
+          expected=(x-ui-linux-{amd64,arm64,armv7,armv6,armv5,386,s390x}.tar.gz x-ui-windows-amd64.zip)
+          [[ $(find . -type f | wc -l) -eq 16 ]]
+          for archive in "${expected[@]}"; do
+            test -s "$archive"
+            test -s "$archive.sha256"
+            read -r hash target < "$archive.sha256"
+            [[ "$hash" =~ ^[[:xdigit:]]{64}$ && "$target" == "$archive" ]]
+            [[ "$(sha256sum "$archive" | cut -d ' ' -f1)" == "${hash,,}" ]]
+          done
+
+      - name: Upload and publish the verified release
+        env:
+          RELEASE_TAG: ${{ steps.source.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" --verify-tag --draft \
+            --title "3x-ui $RELEASE_TAG Ad-Free Edition" \
+            --notes "Ad-free fork of [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui). Packages were built by GitHub Actions run $BUILD_RUN_ID and verified against their SHA-256 checksums."
+          gh release upload "$RELEASE_TAG" packages/*.tar.gz packages/*.zip packages/*.sha256
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease=false --latest=true
