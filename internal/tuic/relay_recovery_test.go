@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"net"
 	"runtime"
@@ -129,7 +130,17 @@ func audit3ReceivePacket(c *clientquic.Conn, mode uint8, duration time.Duration)
 		return nil, nil, err
 	}
 	p, err := readPacketPayload(r, h)
-	return h, p, err
+	if err != nil {
+		return h, p, err
+	}
+	if mode == packetTransportStream {
+		// Wait for FIN so CancelRead does not race the sender's Close.
+		var extra [1]byte
+		if n, err := io.ReadFull(r, extra[:]); n != 0 || err != io.EOF {
+			return nil, nil, fmt.Errorf("expected end of UDP response stream, got %d extra bytes: %v", n, err)
+		}
+	}
+	return h, p, nil
 }
 
 func TestAudit3UDPAssociationMustRecoverAfterBridgeReadFailure(t *testing.T) {
