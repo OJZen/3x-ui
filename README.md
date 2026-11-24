@@ -4,6 +4,8 @@ This is an ad-free version based on the original 3x-ui project, with built-in ad
 
 Original project: [MHSanaei/3x-ui](https://github.com/MHSanaei/3x-ui)
 
+Fork releases prefix the upstream version number with `10`. For example, upstream `v3.11.0` becomes `v103.11.0`.
+
 ## One-Command Installation
 
 Run the following command as root on a Linux server to install the latest stable release from this repository:
