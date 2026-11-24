@@ -136,8 +136,12 @@ func audit3ReceivePacket(c *clientquic.Conn, mode uint8, duration time.Duration)
 	if mode == packetTransportStream {
 		// Wait for FIN so CancelRead does not race the sender's Close.
 		var extra [1]byte
-		if n, err := io.ReadFull(r, extra[:]); n != 0 || err != io.EOF {
-			return nil, nil, fmt.Errorf("expected end of UDP response stream, got %d extra bytes: %v", n, err)
+		n, err := io.ReadFull(r, extra[:])
+		if n != 0 {
+			return nil, nil, fmt.Errorf("unexpected byte after UDP response: 0x%02x", extra[0])
+		}
+		if err != io.EOF {
+			return nil, nil, fmt.Errorf("read end of UDP response stream: %w", err)
 		}
 	}
 	return h, p, nil
