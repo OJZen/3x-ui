@@ -322,7 +322,10 @@ jobs:
         # The shellcheck integration is off: it reports the stylistic rules
         # (SC2086, SC2046) that main's own workflows trip. The shell scripts
         # the panel ships are linted by the shellcheck step below.
-        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -color -shellcheck=
+        # shortcut: v1.7.12 predates this action input, remove the exception when actionlint recognizes it.
+        run: >-
+          go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -color -shellcheck=
+          -ignore '^input "allow_fork_prs" is not defined in action "anthropics/claude-code-action@v1"\.'
       - name: Install shellcheck
         run: sudo apt-get update && sudo apt-get install -y shellcheck
       - name: shellcheck

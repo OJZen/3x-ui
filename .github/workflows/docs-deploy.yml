@@ -30,6 +30,8 @@ defaults:
 
 jobs:
   build:
+    # The production Pages site and custom domain belong to the upstream repo.
+    if: github.repository == 'MHSanaei/3x-ui'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
